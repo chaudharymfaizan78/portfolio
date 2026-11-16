@@ -20,7 +20,15 @@ book:
       - text: "Research"
         href: chapters/research.qmd
       - text: "Data science"
-        href: chapters/01-EDA.qmd
+        menu:
+          - text: "Urban trees of Saint-Germain-en-Laye"
+            href: chapters/01-EDA.qmd
+          - text: "Late again? Behind TGV delays"
+            href: chapters/02-tgv-delays.qmd
+          - text: "Agentic AI for predictive maintenance"
+            href: chapters/03-agentic-phm.qmd
+          - text: "Coursework"
+            href: chapters/04-coursework.qmd
       - text: "Software"
         href: chapters/development.qmd
       - text: "About"
