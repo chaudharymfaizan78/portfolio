@@ -1,0 +1,11 @@
+<script>
+// Quarto books mark the first navbar link active on every page; fix it by URL.
+document.addEventListener("DOMContentLoaded", () => {
+  const here = location.pathname.split("/").pop() || "index.html";
+  const map = { "research.html": 0, "01-EDA.html": 1, "02-tgv-delays.html": 1,
+                "03-agentic-phm.html": 1, "04-coursework.html": 1,
+                "development.html": 2, "about.html": 3 };
+  const links = document.querySelectorAll(".navbar .navbar-nav .nav-link");
+  links.forEach((a, i) => a.classList.toggle("active", map[here] === i));
+});
+</script>

@@ -1,0 +1,31 @@
+systeme,trajectory_id,scenario,event_start,attendue,recommandation,note,nb_appels_outils,duree_s,erreur
+baseline_11.5K_p3,0,normal,,continue_monitoring,continue_monitoring,correct,0,0.0,
+baseline_11.5K_p3,3,normal,,continue_monitoring,continue_monitoring,correct,0,0.0,
+baseline_11.5K_p3,1,fouling,169.0,engine_inspection,continue_monitoring,wrong,0,0.0,
+baseline_11.5K_p3,4,fouling,119.0,engine_inspection,engine_inspection,correct,0,0.0,
+baseline_11.5K_p3,2,sensor_drift,114.0,sensor_check,continue_monitoring,wrong,0,0.0,
+baseline_11.5K_p3,5,sensor_drift,100.0,sensor_check,continue_monitoring,wrong,0,0.0,
+qwen3:4b,0,normal,,continue_monitoring,engine_inspection,wrong,4,376.7,
+qwen3:4b,3,normal,,continue_monitoring,engine_inspection,wrong,4,507.8,
+qwen3:4b,1,fouling,169.0,engine_inspection,engine_inspection,correct,12,310.3,
+qwen3:4b,4,fouling,119.0,engine_inspection,intensify_monitoring,acceptable,12,365.9,
+qwen3:4b,2,sensor_drift,114.0,sensor_check,,no_answer,12,441.2,
+qwen3:4b,5,sensor_drift,100.0,sensor_check,,no_answer,12,466.0,
+granite3.3:8b,0,normal,,continue_monitoring,intensify_monitoring,acceptable,0,137.4,
+granite3.3:8b,3,normal,,continue_monitoring,,no_answer,0,111.4,
+granite3.3:8b,1,fouling,169.0,engine_inspection,,no_answer,0,110.0,
+granite3.3:8b,4,fouling,119.0,engine_inspection,,no_answer,0,109.8,
+granite3.3:8b,2,sensor_drift,114.0,sensor_check,,no_answer,0,110.2,
+granite3.3:8b,5,sensor_drift,100.0,sensor_check,,no_answer,0,110.7,
+qwen3:8b,0,normal,,continue_monitoring,,no_answer,6,32.0,"ValueError: Window outside the authorized history [0, 250]."
+qwen3:8b,3,normal,,continue_monitoring,,no_answer,6,21.6,"ValueError: Window outside the authorized history [0, 250]."
+qwen3:8b,1,fouling,169.0,engine_inspection,,no_answer,6,21.6,"ValueError: Window outside the authorized history [0, 250]."
+qwen3:8b,4,fouling,119.0,engine_inspection,,no_answer,6,21.2,"ValueError: Window outside the authorized history [0, 250]."
+qwen3:8b,2,sensor_drift,114.0,sensor_check,,no_answer,6,21.8,"ValueError: Window outside the authorized history [0, 250]."
+qwen3:8b,5,sensor_drift,100.0,sensor_check,,no_answer,6,21.2,"ValueError: Window outside the authorized history [0, 250]."
+mistral-nemo:12b,0,normal,,continue_monitoring,,no_answer,3,170.2,
+mistral-nemo:12b,3,normal,,continue_monitoring,,no_answer,3,252.8,
+mistral-nemo:12b,1,fouling,169.0,engine_inspection,,no_answer,3,183.5,
+mistral-nemo:12b,4,fouling,119.0,engine_inspection,,no_answer,3,182.1,
+mistral-nemo:12b,2,sensor_drift,114.0,sensor_check,,no_answer,3,181.0,
+mistral-nemo:12b,5,sensor_drift,100.0,sensor_check,,no_answer,3,202.0,

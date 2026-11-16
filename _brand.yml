@@ -1,0 +1,39 @@
+# Portfolio brand: colours and fonts. Quarto picks this file up automatically.
+# Teal comes from the urban-trees EDA, vermillion from the TGV project.
+
+meta:
+  name: M. Faizan Chaudhary · Data Science Portfolio
+  link: https://chaudharymfaizan78.github.io/portfolio
+
+color:
+  palette:
+    teal:       "#1F7A6D"   # primary accent: structure, links
+    vermillion: "#D55E00"   # secondary accent: highlights, results
+    navy:       "#1D3557"   # tertiary accent: emphasis
+    ink:        "#1B2420"   # body text
+    paper:      "#FAF8F3"   # warm off-white page
+    white:      "#FFFFFF"
+  primary: teal
+  secondary: vermillion
+  tertiary: navy
+  foreground: ink
+  background: paper
+
+typography:
+  fonts:
+    - family: Inter
+      source: google
+      weight: [400, 500, 600, 700, 800]
+    - family: JetBrains Mono
+      source: google
+      weight: [400]
+  base:
+    family: Inter
+    line-height: 1.6
+  headings:
+    family: Inter
+    weight: 700
+  monospace:
+    family: JetBrains Mono
+  link:
+    color: teal

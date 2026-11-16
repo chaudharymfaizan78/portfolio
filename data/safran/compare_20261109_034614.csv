@@ -1,0 +1,13 @@
+systeme,trajectory_id,scenario,event_start,attendue,recommandation,note,nb_appels_outils,duree_s,erreur
+baseline_11.5K_p3,0,normal,,continue_monitoring,continue_monitoring,correct,0,0.0,
+baseline_11.5K_p3,3,normal,,continue_monitoring,continue_monitoring,correct,0,0.0,
+baseline_11.5K_p3,1,fouling,169.0,engine_inspection,continue_monitoring,wrong,0,0.0,
+baseline_11.5K_p3,4,fouling,119.0,engine_inspection,engine_inspection,correct,0,0.0,
+baseline_11.5K_p3,2,sensor_drift,114.0,sensor_check,continue_monitoring,wrong,0,0.0,
+baseline_11.5K_p3,5,sensor_drift,100.0,sensor_check,continue_monitoring,wrong,0,0.0,
+qwen3:8b,0,normal,,continue_monitoring,continue_monitoring,correct,15,264.5,
+qwen3:8b,3,normal,,continue_monitoring,continue_monitoring,correct,15,271.3,
+qwen3:8b,1,fouling,169.0,engine_inspection,continue_monitoring,wrong,15,269.4,
+qwen3:8b,4,fouling,119.0,engine_inspection,continue_monitoring,wrong,15,247.4,
+qwen3:8b,2,sensor_drift,114.0,sensor_check,intensify_monitoring,acceptable,15,263.0,
+qwen3:8b,5,sensor_drift,100.0,sensor_check,intensify_monitoring,acceptable,15,246.7,

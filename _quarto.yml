@@ -1,0 +1,78 @@
+project:
+  type: book
+  output-dir: _book
+  resources:
+    - assets/
+
+book:
+  title: "M. Faizan Chaudhary"
+  subtitle: "Research · Data Science · Software Engineering"
+  author: "M. Faizan Chaudhary"
+  date: today
+  description: >
+    Research, data science and software engineering by M. Faizan Chaudhary,
+    Master Smart Data Science student at ENSAI and full-stack AI engineer.
+  repo-url: https://github.com/chaudharymfaizan78/portfolio
+  site-url: https://chaudharymfaizan78.github.io/portfolio
+  navbar:
+    title: "Faizan Chaudhary"
+    left:
+      - text: "Research"
+        href: chapters/research.qmd
+      - text: "Data science"
+        href: chapters/01-EDA.qmd
+      - text: "Software"
+        href: chapters/development.qmd
+      - text: "About"
+        href: about.qmd
+
+  # Chapter order. Each part groups the work of one period; the course
+  # placeholders for later semesters are kept under "Coming next" so the book
+  # keeps room to grow.
+  chapters:
+    - index.qmd
+    - about.qmd
+    - part: "Research"
+      chapters:
+        - chapters/research.qmd
+    - part: "Data science · ENSAI"
+      chapters:
+        - chapters/01-EDA.qmd
+        - chapters/02-tgv-delays.qmd
+        - chapters/03-agentic-phm.qmd
+        - chapters/04-coursework.qmd
+    - part: "Software development"
+      chapters:
+        - chapters/development.qmd
+    - part: "Coming next"
+      chapters:
+        - chapters/semester-2.qmd
+        - chapters/semester-3.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+execute:
+  # Re-run a chapter only when its source changes; results are stored in
+  # _freeze/ (commit it, so the published book matches what you rendered).
+  freeze: auto
+  warning: false
+  message: false
+
+format:
+  html:
+    # cosmo is the base; _brand.yml sets colours and fonts; styles.scss adds layout
+    theme: [cosmo, brand, styles.scss]
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-title: "On this page"
+    number-sections: false
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
+    fig-align: center
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    link-external-newwindow: true
+    include-after-body: nav-active.html

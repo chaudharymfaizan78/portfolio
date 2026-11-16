@@ -1,0 +1,223 @@
+---
+title: "Agentic AI for predictive maintenance"
+subtitle: "Can an LLM agent read aircraft-engine data and recommend the right check?"
+---
+
+::: {.project-meta}
+::: {}
+[Project]{.k}
+ENSAI × Safran
+:::
+::: {}
+[Status]{.k}
+In progress
+:::
+::: {}
+[Tools]{.k}
+Python · LangChain · Ollama · PyTorch
+:::
+::: {}
+[Data]{.k}
+Synthetic OpenDeckSMR engines [@opendecksmr]
+:::
+:::
+
+::: callout-warning
+## Work in progress
+This chapter reports the state of the project in November 2026. The results
+come from a **small development set** (six engines) and are a first look,
+not a conclusion.
+:::
+
+## The question
+
+An aircraft engine is monitored flight after flight. At a given flight *t*,
+an engineer asks:
+
+> Based on the information available up to flight *t*, is there evidence of a
+> concerning trend? What are the plausible causes, and what check should be
+> recommended?
+
+Three situations are possible: **gradual ageing** (normal), **compressor
+fouling** (needs an engine inspection) and **sensor drift** (needs a sensor
+check, not an engine inspection). The task is to build an **agent**: a
+language model that reads the documentation, decides which diagnostic tools to
+call, and writes a justified recommendation. It must be able to say
+"insufficient information" and must never treat a tool's output as a
+definitive diagnosis.
+
+## What I built
+
+```{r}
+#| label: phm-setup
+
+library(tidyverse)
+library(here)
+library(scales)
+library(knitr)
+
+theme_set(theme_minimal(base_size = 12) +
+            theme(plot.title.position = "plot",
+                  panel.grid.minor = element_blank(),
+                  legend.position = "top"))
+
+phm_dir <- here("data", "safran")
+```
+
+**1. A rule-based baseline without an LLM.** Alert when the exhaust-gas
+temperature margin (1150 K minus the LPT inlet temperature) stays below a
+threshold for *p* consecutive usable flights. The persistence rule avoids
+alerting on one noisy flight. The supervisors suggested a threshold of
+11.5 K; I swept threshold and persistence over a grid on the development
+trajectories, then evaluated the chosen setting once on held-out test
+trajectories.
+
+**2. A single tool-using agent** (LangChain + Ollama, temperature 0) with
+four tools bound to one engine and **cut at the decision time**, so the model
+physically cannot look into the future:
+
+| Tool | What it returns |
+|---|---|
+| `lire_observations(debut, fin)` | sensor readings and flight conditions, ≤ 30 flights per call |
+| `estimer_sante(debut, fin)` | six health indicators estimated by a pretrained inverse MLP |
+| `calculer_marge(debut, fin)` | the thermal (EGT) margin per flight |
+| `regle_seuil_marge()` | *(optional)* the baseline rule's verdict, as one more piece of evidence |
+
+The agent receives the knowledge base as its system prompt and must answer
+with one of five actions: continue monitoring, intensify monitoring, request
+an engine inspection, request a sensor check, or request additional data.
+
+**3. A fair evaluation harness.** Every model gets the same tools, documents,
+prompt, decision time and step limit. Each run records the recommendation,
+the number of tool calls, the duration and the full reasoning trace (JSON
+lines). The expected action is derived from the hidden scenario labels by
+the **evaluator only**; the agent never sees them.
+
+## The baseline: a trade-off between speed and false alarms
+
+```{r}
+#| label: fig-phm-grid
+#| fig-height: 4.5
+#| fig-cap: "Baseline tuning on the development engines: each point is one (threshold, persistence) setting. Lower-left is better: few false alarms on healthy engines and an early detection of fouling."
+
+grid <- read_csv(file.path(phm_dir, "baseline_grid_dev.csv"), show_col_types = FALSE)
+chosen <- filter(grid, seuil_marge == 11.5, persistance == 3)
+
+grid |>
+  filter(fouling_detection >= 0.9) |>
+  ggplot(aes(normal_fausse_alerte, fouling_retard_median, colour = factor(persistance))) +
+  geom_point(size = 2.4, alpha = .85) +
+  geom_point(data = chosen, shape = 21, size = 6, colour = "#D55E00", stroke = 1.2) +
+  annotate("text", x = chosen$normal_fausse_alerte + .03, y = chosen$fouling_retard_median + 6,
+           label = "chosen: 11.5 K, 3 flights", hjust = 0, colour = "#D55E00", size = 3.4) +
+  scale_x_continuous(labels = label_percent()) +
+  scale_colour_viridis_d(end = .85) +
+  labs(x = "False alarms on healthy engines", y = "Median detection delay\nfor fouling (flights)",
+       colour = "Persistence (flights)")
+```
+
+```{r}
+#| label: tbl-phm-test
+#| tbl-cap: "The baseline on held-out test engines, for three settings."
+
+test <- read_csv(file.path(phm_dir, "baseline_test.csv"), show_col_types = FALSE)
+test |>
+  transmute(
+    `Threshold (K)` = seuil_marge, `Persistence` = persistance,
+    `Fouling detected` = percent(fouling_detection),
+    `Median delay (flights)` = fouling_retard_median,
+    `False alarms (normal)` = percent(normal_fausse_alerte, accuracy = 1),
+    `Alerts on sensor drift` = percent(drift_alerte, accuracy = 1)
+  ) |>
+  kable()
+
+chosen_test <- filter(test, seuil_marge == 11.5, persistance == 3)
+```
+
+Requiring persistence pays off (@fig-phm-grid). On the test engines, the
+chosen rule detects every fouling case with
+`r percent(chosen_test$normal_fausse_alerte)` false alarms on healthy engines,
+against `r percent(test$normal_fausse_alerte[test$persistance == 1], accuracy = 1)`
+without persistence (@tbl-phm-test). Its limits are structural: it detects
+fouling a median of `r chosen_test$fouling_retard_median` flights after it
+starts, and it has **no way to tell sensor drift from real degradation**.
+It can only say "inspect the engine" or "keep monitoring". That gap is the
+reason to try an agent.
+
+## Agents against the baseline
+
+```{r}
+#| label: phm-compare
+
+read_run <- \(f, run) read_csv(file.path(phm_dir, f), show_col_types = FALSE) |>
+  mutate(run = run)
+
+runs <- bind_rows(
+  read_run("compare_20261109_022944.csv", "Run 1: four local models"),
+  read_run("compare_20261109_034614.csv", "Run 2: qwen3:8b, tool errors returned to the model")
+) |>
+  mutate(systeme = if_else(str_starts(systeme, "baseline"), "Baseline (no LLM)", systeme),
+         note = factor(note, levels = c("correct", "acceptable", "wrong", "no_answer"),
+                       labels = c("Correct", "Acceptable", "Wrong", "No answer")))
+```
+
+```{r}
+#| label: fig-phm-compare
+#| fig-height: 4.5
+#| fig-cap: "Outcomes on the six development engines (2 healthy, 2 fouling, 2 sensor drift) at decision flight 250. 'Acceptable' means 'intensify monitoring' where a specific check was expected."
+
+runs |>
+  count(run, systeme, note, .drop = FALSE) |>
+  filter(n > 0 | note == "Correct") |>
+  ggplot(aes(n, systeme, fill = fct_rev(note))) +
+  geom_col(width = .7) +
+  facet_grid(run ~ ., scales = "free_y", space = "free_y", labeller = label_wrap_gen(22)) +
+  scale_fill_manual(values = c(Correct = "#009E73", Acceptable = "#56B4E9",
+                               Wrong = "#D55E00", `No answer` = "grey75"),
+                    breaks = c("Correct", "Acceptable", "Wrong", "No answer")) +
+  scale_x_continuous(breaks = 0:6) +
+  labs(x = "Engines", y = NULL, fill = NULL) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 0))
+```
+
+```{r}
+#| label: tbl-phm-compare
+#| tbl-cap: "Summary per system and run."
+
+runs |>
+  group_by(Run = run, System = systeme) |>
+  summarise(Correct = sum(note == "Correct"), Acceptable = sum(note == "Acceptable"),
+            Wrong = sum(note == "Wrong"), `No answer` = sum(note == "No answer"),
+            `Tool calls (mean)` = round(mean(nb_appels_outils), 1),
+            `Time per case (s)` = round(mean(duree_s)),
+            .groups = "drop") |>
+  kable()
+```
+
+What the first runs show (@fig-phm-compare, @tbl-phm-compare):
+
+- **Plumbing matters first.** In run 1, most models produced no usable answer.
+  Reading the traces showed why: models asked for flights *after* the decision
+  time, the tool raised an exception, and the run died. Returning tool errors
+  to the model as text ("window outside the authorised history, correct the
+  arguments") let it recover; in run 2, qwen3:8b answered every case.
+- **The agent is cautious where the baseline is blind.** On both sensor-drift
+  engines, qwen3:8b recommended *intensify monitoring* (acceptable) where the
+  baseline said "all fine". But it also missed both fouling cases, while the
+  baseline caught one.
+- **Cost.** About 15 tool calls and four to five minutes per case with a
+  local model, against an instant rule.
+
+So far, the agent is **not better** than a tuned rule on raw accuracy. The
+next question is whether it adds value *on top of* the rule.
+
+## Next steps
+
+- Give the agent the baseline rule as a tool (already implemented, flag
+  `--with-baseline-tool`) and measure whether it combines the rule's fouling
+  detection with its own caution on drift.
+- Add trend and change-point tools, so the model does not have to spot a
+  slow drift by reading 30-row tables.
+- Evaluate on more engines and several decision times, and score the
+  *justification* (evidence cited, alternatives considered), not just the
+  final action.

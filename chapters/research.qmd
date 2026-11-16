@@ -1,0 +1,88 @@
+---
+title: "Research and publications"
+code-tools: false
+subtitle: "Peer-reviewed work in deep learning for medical imaging"
+---
+
+## Peer-reviewed publication
+
+::: {.pub-card}
+**A Novel Architecture Optimization Using Deep Learning for Alzheimer's
+Multiclass Disease Detection**
+
+Z. Fatima, I. Noreen, R. Butt, **M. F. Chaudhary**
+
+*Journal of Information Communication Technologies and Robotic Applications
+(JICTRA)*, vol. 17, no. 1, June 2026 · Original article · CC BY-NC 4.0
+
+[DOI: 10.51239/jictra.v17i1.363](https://doi.org/10.51239/jictra.v17i1.363) ·
+[Article page](https://www.jictra.com.pk/index.php/jictra/article/view/363) ·
+[PDF](https://www.jictra.com.pk/index.php/jictra/article/view/363/182)
+:::
+
+::: {.stat-row}
+::: {.stat}
+[90.6 %]{.value}
+[test accuracy]{.label}
+:::
+::: {.stat}
+[96 %]{.value}
+[specificity]{.label}
+:::
+::: {.stat}
+[90 %]{.value}
+[F1-score]{.label}
+:::
+::: {.stat}
+[11]{.value}
+[CNN variants compared]{.label}
+:::
+:::
+
+**Problem.** Alzheimer's disease and Mild Cognitive Impairment (MCI) are
+easiest to treat when caught early, but MRI-based deep-learning classifiers
+struggle with the task: the stages look alike on a scan, labelled data is
+scarce, and convolutional networks overfit easily.
+
+**What we did.** We trained convolutional neural networks to classify brain
+MRI scans into four stages (non-demented, very mild, mild and moderate
+dementia) on the Kaggle Augmented Alzheimer dataset. Rather than proposing
+one fixed network, we optimised the architecture: eleven CNN variants were
+compared while tuning the learning rate, batch size, dropout rate and
+optimiser (Adam, AdamW, SGD) in an ablation study.
+
+**Result.** The best configuration reached **90.6 % accuracy, 96 %
+specificity and a 90 % F1-score**. The high specificity matters clinically:
+few healthy patients are wrongly flagged.
+
+**My contribution.** The paper grew out of my Bachelor's final-year project at
+Bahria University (see below), which I designed and implemented: the CNN
+pipeline, the optimiser ablation and the hyperparameter search.
+
+**Keywords:** Alzheimer's disease · Mild Cognitive Impairment · convolutional
+neural networks · deep learning · hyperparameter optimisation
+
+## Final-year project: machine learning for Alzheimer's disease and MCI
+
+*Bachelor's in Computer Science, Bahria University, Lahore · competitive
+IGNITE funding*
+
+A CNN classifier for Alzheimer's disease stages from MRI scans (Python,
+TensorFlow, Keras), focused on detecting the earliest stages. This project is
+the basis of the publication above.
+
+::: callout-note
+## Coming soon
+The full project write-up, with code and figures, will be added here.
+:::
+
+## Statistical modelling of heart-disease data
+
+EDA and feature engineering on a clinical heart-disease dataset, then a
+comparison of seven classifiers: logistic regression, SVM, decision trees,
+random forests, kNN, naive Bayes and QDA.
+
+::: callout-note
+## Coming soon
+The full analysis, with code and results, will be added here.
+:::

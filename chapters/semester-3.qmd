@@ -1,0 +1,9 @@
+---
+title: "Semester 3"
+code-tools: false
+---
+
+::: callout-note
+## Coming next
+Reserved for a later course or for the Master's internship project.
+:::

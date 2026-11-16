@@ -1,0 +1,11 @@
+---
+title: "Semester 2"
+code-tools: false
+---
+
+::: callout-note
+## Coming next
+This chapter is reserved for a project from a second-semester course. It will
+be replaced by a full analysis (a `.qmd` document plus the code that produces
+it) when that work starts.
+:::

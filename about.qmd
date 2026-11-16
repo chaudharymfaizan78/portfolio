@@ -1,0 +1,126 @@
+---
+title: "About me"
+subtitle: "Data Science Master's student · Full-stack & AI engineer · Rennes, France"
+code-tools: false
+---
+
+::: {.lead-text}
+I studied computer science at Bahria University, published a deep-learning
+paper on Alzheimer's detection, and since 2024 have been building
+production web, mobile and AI systems. I am now doing the Master Smart Data
+Science at ENSAI to put that engineering on solid statistical ground.
+:::
+
+## Experience
+
+::: {.role}
+::: {.role-head}
+[Associate Full Stack Developer]{.role-title}
+[Sept 2025 – present]{.role-when}
+:::
+[Airbridge Devs]{.role-org}
+
+- Led development of a province-scale **monitoring platform for Punjab
+  WASA's** 2026 desilting campaign across 41 districts (government project):
+  GPS field reporting, GIS maps (Leaflet, shapefiles) and dashboards with
+  district KPIs, planned-vs-achieved targets and trends.
+- Built **Skinny Tax**, a citation-backed AI tax assistant: retrieval-augmented
+  generation with pgvector over federal tax law, a self-hosted vLLM server on
+  AWS for chat and embeddings, an end-to-end ingestion pipeline and a 50-state
+  rules scraping pipeline (Playwright).
+- Developed AI features for **Loxala**, a freelancing platform: automated skill
+  evaluation, job matching and talent search; PostgreSQL schema design and
+  query optimisation.
+- Built **United Checkout**, a Shopify app and WooCommerce plugin with MongoDB
+  storage and AWS deployment.
+
+[See the projects →](chapters/development.qmd)
+:::
+
+::: {.role}
+::: {.role-head}
+[Associate AI Engineer Intern]{.role-title}
+[May – Aug 2025]{.role-when}
+:::
+[Symtera Technologies]{.role-org}
+
+- Proof-of-concept models for suspicious-object detection, unattended-bag
+  detection and facial recognition (TensorFlow, Keras, PyTorch, OpenCV, dlib),
+  from data collection to evaluation.
+- An NLP-based fashion chatbot with API integration.
+:::
+
+::: {.role}
+::: {.role-head}
+[Machine Learning Intern]{.role-title}
+[Jun – Jul 2024]{.role-when}
+:::
+[Remote]{.role-org}
+
+- Predictive models for house prices, customer churn and spam detection, with
+  EDA, feature engineering and evaluation (accuracy, precision, recall,
+  confusion matrices).
+:::
+
+## Education
+
+::: {.edu-grid}
+::: {.role}
+[Sept 2026 – 2027]{.role-when}
+
+[Master's in Smart Data Science]{.role-title}
+
+[ENSAI (École Nationale de la Statistique et de l'Analyse de l'Information), Bruz, France]{.role-org}
+:::
+::: {.role}
+[2021 – 2025]{.role-when}
+
+[Bachelor's in Computer Science]{.role-title}
+
+[Bahria University, Lahore, Pakistan]{.role-org}
+
+Final-year project on deep learning for Alzheimer's disease and MCI,
+funded by IGNITE.
+:::
+:::
+
+## Publication
+
+::: {.pub-card}
+Z. Fatima, I. Noreen, R. Butt, **M. F. Chaudhary**. "A Novel Architecture
+Optimization Using Deep Learning for Alzheimer's Multiclass Disease
+Detection." *Journal of Information Communication Technologies and Robotic
+Applications (JICTRA)*, vol. 17, no. 1, 2026
+[@fatima2026alzheimer].
+[DOI 10.51239/jictra.v17i1.363](https://doi.org/10.51239/jictra.v17i1.363) ·
+[Details →](chapters/research.qmd)
+:::
+
+## Skills
+
+::: {.skill-grid}
+::: {.skill}
+#### Programming
+[R (dplyr, ggplot2) · Python · SQL · C++ · TypeScript · Node.js · Next.js · NestJS · React / React Native]{.skill-list}
+:::
+::: {.skill}
+#### Statistics & ML
+[Statistical modelling · classification · EDA · feature engineering · model evaluation · deep learning (TensorFlow, Keras, PyTorch, OpenCV) · transformers · LLM agents]{.skill-list}
+:::
+::: {.skill}
+#### Data & infrastructure
+[PostgreSQL · MongoDB · pgvector · vLLM · Supabase · AWS · Playwright]{.skill-list}
+:::
+::: {.skill}
+#### Reproducibility
+[Quarto · git / GitHub · uvr · uv · virtual environments]{.skill-list}
+:::
+::: {.skill}
+#### Languages
+[English (fluent) · French (beginner)]{.skill-list}
+:::
+:::
+
+::: {.contact-row}
+[<i class="bi bi-github"></i> github.com/chaudharymfaizan78](https://github.com/chaudharymfaizan78)
+:::

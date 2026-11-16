@@ -1,0 +1,42 @@
+---
+title: "Coursework"
+subtitle: "Labs from the Master Smart Data Science"
+code-tools: false
+---
+
+Smaller pieces of work from my courses. They are exercises rather than
+projects, so they are summarised here rather than reproduced in full.
+
+## Machine learning labs (Python)
+
+Three two-hour labs from the Machine Learning course, worked in Jupyter
+notebooks inside a dedicated virtual environment (`numpy`, `scipy`,
+`scikit-learn`, `xgboost`). In each lab the core algorithms are implemented
+by hand before being compared with the library versions.
+
+| Lab | What I implemented | Data |
+|---|---|---|
+| **From linear regression to inverse problems** | OLS via the normal equations (solving, never inverting), multiclass logistic regression, Ridge regularisation, and Ridge used to de-blur an image | diabetes dataset; images |
+| **SVMs, kNN and dimension reduction** | a linear kernel without loops and an SVM on a precomputed Gram matrix, the role of *C*, the kernel trick step by step (explicit features, then polynomial and RBF kernels), kNN for classification and regression, gradient-based dimension reduction | toy 2D datasets; UCI Auto MPG |
+| **Ensembles: boosting and bagging** | decision trees and the depth / overfitting trade-off, AdaBoost from scratch, gradient boosting and XGBoost, bagging and random forests | two moons; Forest Cover Type (7 classes, 54 variables) |
+
+**Take-aways.** Regularisation is the same idea in three disguises: Ridge's
+λ, the SVM's *C* and the depth of a tree all trade fit against stability.
+Boosting fixes trees that are too simple, bagging fixes trees that are too
+unstable.
+
+## R and the tidyverse
+
+Labs from the Reproducible Workflows course, which led to the urban-trees
+analysis in [Chapter 1](01-EDA.qmd):
+
+- **Data wrangling with dplyr and tidyr** on the Palmer penguins data:
+  filtering, grouping, summarising and reshaping.
+- **Quick data audits with `skimr`** rendered as Quarto documents.
+- **First Quarto documents**: literate analyses that mix text, code and
+  output, the building block of this book.
+
+## Command line
+
+Bash scripting exercises: script arguments, loops and executable scripts,
+the glue behind reproducible data pipelines.

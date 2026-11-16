@@ -1,0 +1,403 @@
+---
+title: "Late again? What's really behind TGV delays"
+subtitle: "A data-visualisation story about French high-speed rail punctuality"
+---
+
+::: {.project-meta}
+::: {}
+[Course]{.k}
+Data Visualization · ENSAI
+:::
+::: {}
+[Team]{.k}
+Faizan Chaudhary & Yasira Zafar
+:::
+::: {}
+[Tools]{.k}
+Python · pandas · Bokeh server
+:::
+::: {}
+[Data]{.k}
+SNCF open data, ODbL [@sncf_regularite]
+:::
+::: {}
+[Code]{.k}
+[TGV-delays-DataViz](https://github.com/chaudharymfaizan78/TGV-delays-DataViz)
+:::
+:::
+
+> **When a TGV is late, who is to blame: the trains, the tracks, or the passengers?**
+
+The original project is an interactive **Bokeh server app** that works as the
+slide deck of our talk: a hook, a map of the rail network, then four acts that
+follow Shneiderman's mantra, *overview first, zoom and filter, then details on
+demand* [@shneiderman1996eyes]. This chapter tells the same story for the
+portfolio. The figures below are **re-drawn in R** from the same SNCF files,
+downloaded by code at render time, so every number in the text is recomputed
+rather than copied from the report.
+
+```{r}
+#| label: tgv-setup
+
+library(tidyverse)
+library(here)
+library(scales)
+library(knitr)
+
+theme_set(theme_minimal(base_size = 12) +
+            theme(plot.title.position = "plot",
+                  panel.grid.minor = element_blank(),
+                  legend.position = "top"))
+
+accent <- "#D55E00"   # vermillion: the series the story follows
+context <- "grey65"   # everything else
+```
+
+## Data
+
+SNCF publishes three monthly punctuality files on data.gouv.fr. Each level of
+the story uses **its own file**: the national rate is not the average of axes
+or routes, because one train can belong to several routes but counts only once
+nationally.
+
+| File | Level | Used for |
+|---|---|---|
+| `reglarite-mensuelle-tgv-nationale` | all TGVs, monthly, from 2015 | Act 1: the big picture |
+| `regularite-mensuelle-tgv-axes` | per axis (Nord, Est, Atlantique, Sud-Est, Europe, OUIGO) | Act 2: regions |
+| `regularite-mensuelle-tgv-aqst` | per route, with train counts and six delay causes, from 2018 | Acts 3 and 4 |
+
+```{r}
+#| label: tgv-download
+
+sncf_url <- "https://ressources.data.sncf.com/api/explore/v2.1/catalog/datasets/%s/exports/csv?use_labels=true"
+tgv_files <- c(national = "reglarite-mensuelle-tgv-nationale",   # (sic: SNCF's file name)
+               axes     = "regularite-mensuelle-tgv-axes",
+               routes   = "regularite-mensuelle-tgv-aqst")
+
+dir.create(here("data", "raw"), recursive = TRUE, showWarnings = FALSE)
+tgv_path <- \(key) here("data", "raw", paste0(tgv_files[[key]], ".csv"))
+for (key in names(tgv_files)) {
+  if (!file.exists(tgv_path(key)))
+    download.file(sprintf(sncf_url, tgv_files[[key]]), tgv_path(key), mode = "wb", quiet = TRUE)
+}
+
+read_sncf <- \(key) read_delim(tgv_path(key), delim = ";", show_col_types = FALSE)
+```
+
+### Cleaning decisions
+
+The full log of ambiguities and decisions lives in the project's
+`DATA_NOTES.md`. The ones that matter for this chapter:
+
+- **% late is computed from counts**: late trains ÷ (planned − cancelled).
+  Yearly and group figures **sum the counts first, then divide**, never
+  averaging percentages.
+- **Months with zero planned trains are dropped** (nothing to measure).
+- **Rows whose six cause shares are all zero** keep their counts but are left
+  out of the cause analysis.
+- **Cause shares are weighted** by each row's number of late trains, so a
+  3-train route does not weigh as much as a 300-train one.
+- **Causes are compared on full years 2018–2025**: the categories appear to
+  change around May 2026.
+- The national file has no counts, so its yearly rate is the **mean of monthly
+  percentages**, an approximation we state as such.
+
+```{r}
+#| label: tgv-clean
+
+national <- read_sncf("national") |>
+  transmute(date = ym(Date), pct_late = 100 - `Régularité composite`)
+
+axes <- read_sncf("axes") |>
+  transmute(date = ym(Date), axis = Axe, pct_late = 100 - `Régularité composite`)
+
+foreign <- c("BARCELONA", "MADRID", "FRANCFORT", "STUTTGART",
+             "ZURICH", "LAUSANNE", "GENEVE", "ITALIE")
+
+routes <- read_sncf("routes") |>
+  transmute(
+    date = ym(Date), service = Service,
+    departure = `Gare de départ`, arrival = `Gare d'arrivée`,
+    planned = `Nombre de circulations prévues`,
+    cancelled = `Nombre de trains annulés`,
+    late = `Nombre de trains en retard à l'arrivée`,
+    External = `Prct retard pour causes externes`,
+    Infrastructure = `Prct retard pour cause infrastructure`,
+    `Traffic management` = `Prct retard pour cause gestion trafic`,
+    `Rolling stock` = `Prct retard pour cause matériel roulant`,
+    `Station management` = `Prct retard pour cause gestion en gare et réutilisation de matériel`,
+    Passengers = `Prct retard pour cause prise en compte voyageurs (affluence, gestions PSH, correspondances)`
+  ) |>
+  filter(planned > 0) |>
+  mutate(
+    ran  = planned - cancelled,
+    year = year(date),
+    type = case_when(
+      departure %in% foreign | arrival %in% foreign ~ "International",
+      str_starts(departure, "PARIS") | str_starts(arrival, "PARIS") ~ "To/from Paris",
+      TRUE ~ "Province to province"
+    )
+  )
+
+national_yearly <- national |>
+  group_by(year = year(date)) |>
+  summarise(pct_late = mean(pct_late), months = n(), .groups = "drop")
+
+latest      <- national_yearly |> slice_max(year)
+last_month  <- max(national$date)
+worst_prev  <- national_yearly |> filter(year < latest$year) |> slice_max(pct_late)
+```
+
+## The hook: about one TGV in six
+
+::: {.stat-row}
+::: {.stat}
+[`r number(latest$pct_late, accuracy = 0.1)` %]{.value}
+[of TGVs late in `r latest$year` (Jan–`r month.abb[month(last_month)]`)]{.label}
+:::
+::: {.stat}
+[`r latest$year`]{.value}
+[`r if (latest$pct_late > worst_prev$pct_late) "the worst year since 2015" else "not the worst year"`]{.label}
+:::
+::: {.stat}
+[`r number(sum(routes$ran), big.mark = ",")`]{.value}
+[route-trains analysed since 2018]{.label}
+:::
+:::
+
+## Act 1 · The big picture
+
+```{r}
+#| label: fig-tgv-national
+#| fig-height: 4.5
+#| fig-cap: "Share of TGVs arriving late each month since 2015. Shaded bands mark major events (from news sources, not from the data): they coincide with peaks but do not prove a cause."
+
+events <- tribble(
+  ~start,       ~end,         ~label,
+  "2018-04-01", "2018-06-30", "Rail strike",
+  "2019-12-01", "2020-01-31", "Pension strike",
+  "2020-03-15", "2020-05-15", "COVID lockdown",
+  "2022-07-01", "2022-07-31", "Heatwave",
+  "2023-01-15", "2023-04-15", "Pension strikes"
+) |> mutate(across(c(start, end), as.Date))
+
+ggplot(national, aes(date, pct_late)) +
+  geom_rect(data = events, aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf),
+            inherit.aes = FALSE, fill = "#1D3557", alpha = .08) +
+  geom_text(data = events, aes(x = start, y = Inf, label = label), inherit.aes = FALSE,
+            angle = 90, hjust = 1.05, vjust = -0.4, size = 2.8, colour = "#1D3557") +
+  geom_line(colour = context) +
+  geom_line(data = filter(national, year(date) == latest$year), colour = accent, linewidth = 1) +
+  scale_y_continuous(labels = label_percent(scale = 1)) +
+  labs(x = NULL, y = "Trains late")
+```
+
+```{r}
+#| label: tgv-season
+#| include: false
+
+by_month <- national |>
+  group_by(month = month.name[month(date)]) |>
+  summarise(pct_late = mean(pct_late), .groups = "drop")
+best_m  <- slice_min(by_month, pct_late)
+worst_m <- slice_max(by_month, pct_late)
+covid   <- national_yearly |> filter(year %in% 2020:2021)
+```
+
+Punctuality is getting worse: `r latest$year` is the worst year in the data
+(@fig-tgv-national). The COVID years were the most punctual
+(`r number(covid$pct_late[1], accuracy = 0.1)` % and
+`r number(covid$pct_late[2], accuracy = 0.1)` % late in 2020 and 2021), but
+the month-to-month number of trains barely relates to the share late, so
+"fewer trains" is not a supported explanation. Summers are worst:
+**`r worst_m$month`** averages `r number(worst_m$pct_late, accuracy = 0.1)` %
+late against `r number(best_m$pct_late, accuracy = 0.1)` % in
+`r best_m$month`.
+
+## Act 2 · Not all of France is equal
+
+```{r}
+#| label: fig-tgv-axes
+#| fig-height: 4.5
+#| fig-cap: "Yearly share of late TGVs on the four regional axes, with the national rate in grey. Only years with twelve months of data are shown."
+
+regional <- c("Est", "Atlantique", "Nord", "Sud-Est")
+axes_yearly <- axes |>
+  group_by(axis, year = year(date)) |>
+  summarise(pct_late = mean(pct_late), months = n(), .groups = "drop") |>
+  filter(months == 12)
+
+axes_yearly |>
+  filter(axis %in% regional) |>
+  ggplot(aes(year, pct_late, colour = axis)) +
+  geom_line(data = filter(national_yearly, months == 12), aes(year, pct_late),
+            inherit.aes = FALSE, colour = "grey50", linewidth = 1.6, alpha = .5) +
+  geom_line(linewidth = .9) +
+  geom_point(size = 1.6) +
+  scale_colour_manual(values = c(Est = accent, Atlantique = "#0072B2",
+                                 Nord = "#009E73", `Sud-Est` = "#56B4E9")) +
+  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_x_continuous(breaks = pretty_breaks()) +
+  labs(x = NULL, y = "Trains late", colour = NULL)
+```
+
+```{r}
+#| label: tgv-axes-ranking
+#| include: false
+
+best_axis <- axes_yearly |>
+  filter(axis %in% regional) |>
+  group_by(year) |> slice_min(pct_late, n = 1) |> ungroup()
+est_until <- best_axis |>
+  mutate(run = cumprod(axis == "Est")) |> filter(run == 1, year > 2015) |> pull(year) |> max()
+worst_axis <- axes_yearly |> group_by(year) |> slice_max(pct_late, n = 1) |> ungroup()
+```
+
+The axes diverge over time (@fig-tgv-axes). **Est** was the most punctual
+regional axis every year until `r est_until`, after which the ranking shuffles.
+Across all six axes, the **Europe** (international) axis has been the worst in
+`r sum(worst_axis$axis == "Europe" & worst_axis$year >= 2022)` of the
+`r sum(worst_axis$year >= 2022)` full years since 2022.
+
+## Act 3 · It's where, not how far
+
+```{r}
+#| label: tgv-route-types
+#| include: false
+
+type_rates <- routes |>
+  group_by(type) |>
+  summarise(pct_late = 100 * sum(late) / sum(ran), routes = n_distinct(paste(departure, arrival)),
+            .groups = "drop")
+prov  <- filter(type_rates, type == "Province to province")
+paris <- filter(type_rates, type == "To/from Paris")
+
+gap <- routes |>
+  filter(year <= 2025, type != "International") |>
+  group_by(year, type) |>
+  summarise(p = 100 * sum(late) / sum(ran), .groups = "drop") |>
+  pivot_wider(names_from = type, values_from = p) |>
+  mutate(gap = `Province to province` - `To/from Paris`)
+```
+
+In the app, a route map and a duration-versus-delay scatter share one data
+source, so selecting routes on either highlights them on both. The first
+hypothesis, *long routes are late more often*, did not hold: trip duration
+barely relates to the share late. What does matter is **where** a route runs.
+
+```{r}
+#| label: fig-tgv-types
+#| fig-height: 4
+#| fig-cap: "Yearly share of late trains by type of route (counts summed, then divided). International routes rest on far fewer trains."
+
+routes |>
+  group_by(year, type) |>
+  summarise(pct_late = 100 * sum(late) / sum(ran), .groups = "drop") |>
+  ggplot(aes(year, pct_late, colour = type)) +
+  geom_line(linewidth = .9) +
+  geom_point(size = 1.6) +
+  scale_colour_manual(values = c(`Province to province` = accent,
+                                 `To/from Paris` = "#0072B2",
+                                 International = context)) +
+  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_x_continuous(breaks = pretty_breaks()) +
+  labs(x = NULL, y = "Trains late", colour = NULL)
+```
+
+Routes between two regional cities that do not go through Paris are late more
+often (`r number(prov$pct_late, accuracy = 0.1)` %) than routes to or from
+Paris (`r number(paris$pct_late, accuracy = 0.1)` %), and the gap holds in
+**every year** from 2018 to 2025, by
+`r number(min(gap$gap), accuracy = 0.1)` to
+`r number(max(gap$gap), accuracy = 0.1)` points (@fig-tgv-types). The data
+shows *where* delays concentrate, not *why*.
+
+## Act 4 · Who's to blame?
+
+```{r}
+#| label: tgv-causes
+
+cause_cols <- c("External", "Infrastructure", "Traffic management",
+                "Rolling stock", "Station management", "Passengers")
+groups <- c(External = "External", Infrastructure = "Tracks",
+            `Traffic management` = "Tracks", `Rolling stock` = "Trains",
+            `Station management` = "Trains", Passengers = "Passengers")
+
+causes <- routes |>
+  filter(year %in% 2018:2025, rowSums(across(all_of(cause_cols))) > 0) |>
+  pivot_longer(all_of(cause_cols), names_to = "cause", values_to = "share") |>
+  mutate(group = factor(groups[cause], levels = c("Tracks", "Trains", "External", "Passengers")),
+         late_trains = share / 100 * late)
+
+cause_total <- causes |>
+  group_by(group) |>
+  summarise(n = sum(late_trains), .groups = "drop") |>
+  mutate(pct = 100 * n / sum(n))
+pct_of <- \(g) number(cause_total$pct[cause_total$group == g], accuracy = 1)
+```
+
+```{r}
+#| label: fig-tgv-causes
+#| fig-height: 4.5
+#| fig-cap: "Delay causes as attributed by SNCF, weighted by the number of late trains (2018–2025). Okabe-Ito colour-blind-safe palette."
+
+causes |>
+  group_by(year, group) |>
+  summarise(n = sum(late_trains), .groups = "drop") |>
+  group_by(year) |>
+  mutate(pct = n / sum(n)) |>
+  ggplot(aes(factor(year), pct, fill = fct_rev(group))) +
+  geom_col(width = .75, colour = "white", linewidth = .4) +
+  scale_fill_manual(values = c(Tracks = "#D55E00", Trains = "#0072B2",
+                               External = "#009E73", Passengers = "#CC79A7"),
+                    breaks = c("Tracks", "Trains", "External", "Passengers")) +
+  scale_y_continuous(labels = label_percent(), expand = c(0, 0)) +
+  labs(x = NULL, y = "Share of late trains", fill = NULL)
+```
+
+Mostly the tracks (@fig-tgv-causes). Weighted by late trains, **tracks**
+(infrastructure + traffic management) account for `r pct_of("Tracks")` % of
+delays, **trains** (rolling stock + station management) `r pct_of("Trains")` %,
+**external** causes `r pct_of("External")` % and **passengers**
+`r pct_of("Passengers")` %. Two caveats: SNCF attributes the causes itself, and
+the "tracks first" result depends on our grouping, since no single SNCF
+category dominates on its own.
+
+## Visualisation and accessibility choices
+
+- **One accent colour per chart**: grey for context, vermillion for the series
+  the story follows.
+- **Act 3 colour scales are fixed** at 0–30 % late (ColorBrewer YlOrRd), so a
+  colour means the same thing whatever year is selected.
+- **Two accessibility approaches**: the cause chart does not rely on colour
+  alone (Okabe-Ito palette checked with a colour-vision-deficiency simulator,
+  white gaps, legend and optional hatch patterns); the punctuality chart has
+  text alternatives (a written summary generated from the data, detailed
+  tooltips and a drawer with the full data table).
+- **Iterated on feedback**: after a review with the teacher, the six axis
+  panels became one comparable chart, the route-type dropdown became a
+  carousel of cards, and the map colour scale moved from a single red hue to a
+  sequential yellow-to-red scale.
+
+## Limitations
+
+- Monthly totals, not individual trains.
+- Delay causes are self-reported by SNCF; the categories seem to change in
+  2026 and the passenger share jumps suddenly in January 2021.
+- The national and route-level rates differ in level (for example
+  `r number(national_yearly$pct_late[national_yearly$year == 2025], accuracy = 0.1)` %
+  vs `r number(with(filter(routes, year == 2025), 100 * sum(late) / sum(ran)), accuracy = 0.1)` %
+  in 2025) for reasons we could not confirm, so they are never compared
+  directly.
+- Correlation is not causation: the charts show where and when delays happen,
+  not why.
+
+## Running the original app
+
+```bash
+git clone https://github.com/chaudharymfaizan78/TGV-delays-DataViz.git
+cd TGV-delays-DataViz
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+bokeh serve --show Bokeh_App
+```

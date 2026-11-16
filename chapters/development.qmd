@@ -1,0 +1,138 @@
+---
+title: "Software development"
+subtitle: "Production systems built at Airbridge Devs and as a freelance engineer"
+code-tools: false
+---
+
+Before and alongside the Master's, I build and ship full-stack and AI
+products: from database schema to mobile app store release. The projects
+below are client work, so the code is private; this page describes what each
+system does, how it is built and what I was responsible for.
+
+::: {.stat-row}
+::: {.stat}
+[5]{.value}
+[production systems]{.label}
+:::
+::: {.stat}
+[3]{.value}
+[platforms: web, mobile and AI]{.label}
+:::
+::: {.stat}
+[AWS]{.value}
+[EC2, RDS, Amplify, Route 53]{.label}
+:::
+:::
+
+::: {.proj}
+## Spana · salon booking and management platform
+
+*Full-stack and mobile · bilingual (English / Arabic) · live on AWS*
+
+A platform for beauty salons: owners manage their business, staff manage
+their schedules, and customers discover salons and book through a public
+salon page or the mobile app.
+
+- **Features:** appointment booking and calendar, services and categories,
+  staff management (documents, leave requests), customer accounts with OTP
+  login, reviews, waitlist, notifications, reports and dashboards, support
+  tickets, a platform admin console, and shareable public salon links.
+- **Architecture:** a NestJS + TypeORM REST API on PostgreSQL (AWS RDS), a
+  Next.js web app, a React Native (Expo) mobile app for owners, employees and
+  customers, and a marketing landing page.
+- **My launch work:** a launch-readiness audit of all four repositories
+  (a 76-item go-live checklist); the production cut-over runbook (separate
+  dev and prod environments, DNS on Route 53, TLS, AWS Amplify branches);
+  research and recommendation of SMS-OTP and email providers; full
+  account deletion across backend, web and mobile, as required by Google
+  Play; and the English and Arabic versions of the privacy policy and terms.
+
+::: {.chips .lg}
+[NestJS]{} [TypeORM]{} [PostgreSQL]{} [Next.js]{} [React Native / Expo]{} [NativeWind]{} [Twilio]{} [AWS EC2 / RDS / Amplify]{} [i18n (EN/AR)]{}
+:::
+:::
+
+::: {.proj}
+## Skinny Tax · AI tax assistant with citations
+
+*Retrieval-augmented generation · self-hosted LLM*
+
+A chat assistant that answers US tax questions **with citations** to the
+exact passage of the law it relied on, so every answer can be checked.
+
+- **Corpus:** the Internal Revenue Code (Title 26), Treasury Regulations and
+  reference publications, plus tax rules for all 50 states collected by a
+  scraping pipeline I built with Playwright (with relevance filters and
+  quality audits to keep guides and statutes, not forms and archives). Users
+  can also upload their own PDF, Word, Excel or text files.
+- **RAG pipeline:** parse → chunk → embed → store in PostgreSQL with
+  **pgvector** → retrieve → generate, with a "RAG explorer" panel showing the
+  retrieved chunk behind each citation.
+- **Serving:** a self-hosted **vLLM** deployment on AWS (one model for chat,
+  one for embeddings, OpenAI-compatible API), an Express API on EC2 deployed
+  through GitHub Actions, and a React front end on AWS Amplify.
+
+::: {.chips .lg}
+[TypeScript]{} [React / Vite]{} [Express]{} [PostgreSQL + pgvector]{} [vLLM]{} [Playwright]{} [AWS EC2 / RDS / Amplify]{} [GitHub Actions]{}
+:::
+:::
+
+::: {.proj}
+## United Checkout · one-click checkout for e-commerce
+
+*Shopify app · WooCommerce plugin · NestJS API*
+
+A fast-checkout layer for online shops: the shopper confirms an order in a
+modal with phone OTP verification and a map-based address check, instead of
+the full checkout form.
+
+- **Shopify:** an embedded Shopify app (orders, customers, fulfilments)
+  with OAuth install flow and webhooks.
+- **WooCommerce:** a WordPress plugin that adds the fast-checkout button to
+  product, cart and checkout pages and talks to the API over AJAX.
+- **Backend and admin:** a NestJS API (versioned routes, JWT auth, global
+  error handling) with MongoDB storage, a React admin dashboard, deployed on
+  AWS.
+
+::: {.chips .lg}
+[NestJS]{} [MongoDB]{} [React]{} [Shopify app]{} [PHP / WordPress]{} [WooCommerce]{} [AWS]{}
+:::
+:::
+
+::: {.proj}
+## Punjab WASA desilting monitoring platform
+
+*Government project · GIS · dashboards*
+
+I led development of a province-scale monitoring platform for Punjab WASA's
+2026 desilting campaign across **41 districts**: GPS-tagged field reporting
+from site teams, GIS maps built with Leaflet and shapefiles, and dashboards
+with district KPIs, planned-versus-achieved targets and trends.
+
+::: {.chips .lg}
+[Leaflet]{} [shapefiles / GIS]{} [dashboards]{} [full stack]{}
+:::
+:::
+
+::: {.proj}
+## Loxala · AI features for a freelancing platform
+
+AI features for a freelancing marketplace: automated skill evaluation, job
+matching (SkillMatcher) and talent search (Loxi), backed by PostgreSQL schemas
+and query optimisation I designed.
+
+::: {.chips .lg}
+[AI / NLP]{} [PostgreSQL]{} [full stack]{}
+:::
+:::
+
+::: {.proj}
+## Earlier: computer vision and NLP prototypes
+
+*Symtera Technologies, AI engineer intern (2025)*
+
+Proof-of-concept models for suspicious-object detection, unattended-bag
+detection and facial recognition (TensorFlow, Keras, PyTorch, OpenCV, dlib),
+from data collection to evaluation, and an NLP fashion chatbot with API
+integration.
+:::
