@@ -122,5 +122,6 @@ Applications (JICTRA)*, vol. 17, no. 1, 2026
 :::
 
 ::: {.contact-row}
-[<i class="bi bi-github"></i> github.com/chaudharymfaizan78](https://github.com/chaudharymfaizan78)
+[<i class="bi bi-download"></i> Download my CV (PDF)](assets/cv/Faizan_Chaudhary_CV.pdf){download=""}
+[<i class="bi bi-github"></i> github.com/chaudharymfaizan78](https://github.com/chaudharymfaizan78){.alt}
 :::

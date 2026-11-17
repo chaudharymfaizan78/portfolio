@@ -580,3 +580,36 @@ main.content {
   .navbar .navbar-brand-container { max-width: 62%; }
   .navbar .quarto-navbar-tools { display: none; }   /* GitHub icon; still in the menu and footer links */
 }
+
+/* ---------- Download CV ---------- */
+.btn-hero.light { background: #fff; color: #0B1626 !important; box-shadow: 0 8px 20px -10px rgba(255,255,255,.5); }
+.btn-hero.light:hover { background: #E8F6F3; }
+.navbar .navbar-nav.ms-auto .nav-link, .navbar .quarto-navbar-tools + .navbar-nav .nav-link,
+.navbar #navbarCollapse .navbar-nav:last-of-type .nav-link[href$=".pdf"] {
+  background: $ink; color: #fff !important; border-radius: 999px; padding: .4rem 1rem !important;
+  font-size: .85rem; margin-left: .5rem;
+  &:hover { background: $teal; }
+  i, .bi { color: #fff; }
+}
+.contact-row { display: flex; flex-wrap: wrap; gap: .7rem;
+  a.alt { background: #fff; color: $ink !important; border: 1px solid $line; } }
+
+/* ---------- Client logos ---------- */
+.d-logo {
+  width: 56px; height: 56px; border-radius: 14px; background: #fff; border: 1px solid $line;
+  display: grid; place-items: center; overflow: hidden; padding: 6px;
+  img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 0 !important; }
+  &.wide { width: 112px; padding: 6px 10px; }
+}
+.proj.has-logo { position: relative; }
+.proj-logo {
+  position: absolute; top: 1.2rem; right: 1.4rem; height: 52px; max-width: 120px;
+  display: flex; align-items: center; justify-content: flex-end;
+  img { max-height: 52px; max-width: 120px; object-fit: contain; border-radius: 0 !important; }
+}
+.proj.has-logo h2 { padding-right: 140px; }
+@media (max-width: 767.98px) {
+  .proj-logo { position: static; justify-content: flex-start; margin: 1rem 0 -.4rem; height: 40px;
+    img { max-height: 40px; } }
+  .proj.has-logo h2 { padding-right: 0; }
+}

@@ -33,6 +33,10 @@ book:
         href: chapters/development.qmd
       - text: "About"
         href: about.qmd
+    right:
+      - text: "Download CV"
+        icon: download
+        href: assets/cv/Faizan_Chaudhary_CV.pdf
 
   # Chapter order. Each part groups the work of one period; the course
   # placeholders for later semesters are kept under "Coming next" so the book

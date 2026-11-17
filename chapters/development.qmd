@@ -24,7 +24,11 @@ system does, how it is built and what I was responsible for.
 :::
 :::
 
-::: {.proj}
+::: {.proj .has-logo}
+```{=html}
+<div class="proj-logo"><img src="../assets/logos/spana.png" alt="Spana logo"></div>
+```
+
 ## Spana · salon booking and management platform
 
 *Full-stack and mobile · bilingual (English / Arabic) · live on AWS*
@@ -52,7 +56,11 @@ salon page or the mobile app.
 :::
 :::
 
-::: {.proj}
+::: {.proj .has-logo}
+```{=html}
+<div class="proj-logo"><img src="../assets/logos/skinnytax.png" alt="Skinny Tax logo"></div>
+```
+
 ## Skinny Tax · AI tax assistant with citations
 
 *Retrieval-augmented generation · self-hosted LLM*
@@ -77,7 +85,11 @@ exact passage of the law it relied on, so every answer can be checked.
 :::
 :::
 
-::: {.proj}
+::: {.proj .has-logo}
+```{=html}
+<div class="proj-logo"><img src="../assets/logos/united-checkout.png" alt="United Checkout logo"></div>
+```
+
 ## United Checkout · one-click checkout for e-commerce
 
 *Shopify app · WooCommerce plugin · NestJS API*

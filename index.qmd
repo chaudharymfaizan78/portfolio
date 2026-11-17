@@ -20,6 +20,7 @@ code-tools: false
       </p>
       <div class="hero-cta">
         <a class="btn-hero primary" href="#work">See my work <i class="bi bi-arrow-down"></i></a>
+        <a class="btn-hero light" href="assets/cv/Faizan_Chaudhary_CV.pdf" download><i class="bi bi-download"></i> Download CV</a>
         <a class="btn-hero ghost" href="chapters/research.html"><i class="bi bi-journal-text"></i> Read the paper</a>
         <a class="btn-hero ghost" href="https://github.com/chaudharymfaizan78"><i class="bi bi-github"></i> GitHub</a>
       </div>
@@ -119,21 +120,21 @@ code-tools: false
   </div>
   <div class="dev-grid">
     <a class="dcard" href="chapters/development.html#spana-salon-booking-and-management-platform">
-      <div class="d-icon c1"><i class="bi bi-calendar2-check"></i></div>
+      <div class="d-logo wide"><img src="assets/logos/spana.png" alt="Spana logo"></div>
       <h3>Spana</h3>
       <p>Salon booking and management: REST API, web app and mobile app,
          bilingual English/Arabic, live on AWS.</p>
       <div class="chips"><span>NestJS</span><span>Next.js</span><span>React Native</span><span>PostgreSQL</span></div>
     </a>
     <a class="dcard" href="chapters/development.html#skinny-tax-ai-tax-assistant-with-citations">
-      <div class="d-icon c2"><i class="bi bi-chat-square-quote"></i></div>
+      <div class="d-logo"><img src="assets/logos/skinnytax.png" alt="Skinny Tax logo"></div>
       <h3>Skinny Tax</h3>
       <p>An AI tax assistant that cites the law: RAG over federal and 50-state
          tax rules with a self-hosted LLM.</p>
       <div class="chips"><span>RAG</span><span>pgvector</span><span>vLLM</span><span>Playwright</span></div>
     </a>
     <a class="dcard" href="chapters/development.html#united-checkout-one-click-checkout-for-e-commerce">
-      <div class="d-icon c3"><i class="bi bi-bag-check"></i></div>
+      <div class="d-logo wide"><img src="assets/logos/united-checkout.png" alt="United Checkout logo"></div>
       <h3>United Checkout</h3>
       <p>One-click checkout with OTP and map-based address verification, as a
          Shopify app and a WooCommerce plugin.</p>
@@ -192,7 +193,8 @@ code-tools: false
     <p>Open to data science and AI internships, research collaborations and engineering projects.</p>
   </div>
   <div class="hero-cta">
-    <a class="btn-hero primary" href="about.html"><i class="bi bi-person"></i> About me</a>
+    <a class="btn-hero primary" href="assets/cv/Faizan_Chaudhary_CV.pdf" download><i class="bi bi-download"></i> Download CV</a>
+    <a class="btn-hero ghost" href="about.html"><i class="bi bi-person"></i> About me</a>
     <a class="btn-hero ghost" href="https://github.com/chaudharymfaizan78"><i class="bi bi-github"></i> GitHub</a>
   </div>
 </section>
